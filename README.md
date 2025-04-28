@@ -1,28 +1,46 @@
-📚 Materiais de Aula
-✏️ Sobre este Repositório
-Este repositório contém os materiais utilizados nas aulas ministradas, organizados de forma a facilitar o acesso, a consulta e a reutilização por parte dos alunos e demais interessados. Os conteúdos aqui disponibilizados abrangem apresentações, códigos-fonte, exercícios, roteiros de prática, artigos de apoio e referências bibliográficas.
+🎓 Materiais de Aula — [Seu Nome]
+Este repositório reúne todos os materiais utilizados em minhas aulas, organizados para apoiar o processo de ensino-aprendizagem de forma clara, acessível e didática.
 
-Todo o material foi desenvolvido com rigor acadêmico, visando à excelência no processo de ensino-aprendizagem e respeitando os princípios de acessibilidade, clareza didática e atualização científica.
+🎯 Objetivos
+Promover o estudo ativo e a prática contínua.
 
-🎯 Objetivos Pedagógicos
-Oferecer suporte ao processo de aprendizagem autônoma e continuada.
+Estimular o desenvolvimento de projetos e o pensamento crítico.
 
-Facilitar a prática de conceitos teóricos por meio de aplicações práticas.
-
-Incentivar o desenvolvimento de projetos acadêmicos e profissionais de alta qualidade.
-
-Fomentar a pesquisa científica, o pensamento crítico e a aplicação ética dos conhecimentos.
+Incentivar a aplicação ética e científica dos conhecimentos técnicos.
 
 🛠 Tecnologias Utilizadas
-Dependendo do módulo ou disciplina, os materiais podem envolver:
+Linguagens: Python, JavaScript, SQL, C++
 
-Linguagens de programação: Python, JavaScript, C++, SQL, entre outras.
+Frameworks e bibliotecas: Pandas, Scikit-learn, Node.js, React
 
-Frameworks e bibliotecas: Pandas, Scikit-learn, Node.js, React, etc.
+Ferramentas: VSCode, Google Colab, PostgreSQL, Supabase, Docker
 
-Plataformas de apoio: Google Colab, VSCode, PostgreSQL, Supabase, etc.
+📚 Como Utilizar
+Clone este repositório:
 
-📄 Licenciamento e Uso
-Os materiais estão disponibilizados exclusivamente para fins educacionais. É permitida a utilização individual ou em grupos de estudo, bem como a adaptação para atividades acadêmicas, desde que sejam citadas as devidas referências ao autor e ao repositório original.
+bash
+Copiar
+Editar
+git clone https://github.com/seu-usuario/seu-repositorio.git
+Navegue pelas pastas conforme a necessidade.
 
-É vedada a comercialização ou o uso para fins lucrativos sem autorização expressa.
+Leia as instruções específicas de cada projeto ou atividade.
+
+Execute as práticas recomendadas para maximizar seu aprendizado.
+
+📄 Licenciamento
+Uso educacional permitido.
+A reprodução ou adaptação para fins acadêmicos é livre, com atribuição de créditos.
+Proibido o uso comercial sem autorização expressa.
+
+✉️ Contato
+Professor responsável: [Seu Nome]
+
+E-mail institucional: [seu.email@instituicao.edu]
+
+LinkedIn: linkedin.com/in/seunome
+
+"A educação é a arma mais poderosa que você pode usar para mudar o mundo." — Nelson Mandela
+
+📎 Observação
+Para projetos que exigem instalação de dependências, consulte os respectivos README.md nas subpastas.
