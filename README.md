@@ -1,4 +1,7 @@
-🎓 Materiais de Aula — [Seu Nome]
+🎓 Materiais de Aula —
+
+---
+
 Este repositório reúne os materiais utilizados nas aulas, organizados para apoiar o processo de ensino-aprendizagem de forma clara, acessível e didática.
 
 🎯 Objetivos
