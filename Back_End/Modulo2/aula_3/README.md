@@ -324,7 +324,7 @@ Este projeto ensina como criar uma aplicação web com formulário que realiza o
 
 ## 1. 🗃️ Criação da Tabela `aluno` no Supabase
 
-Acesse o painel do [Supabase](https://app.supabase.com/), vá até **SQL Editor** e rode manualmente dentro do supabase ou dentro do MVC edite o arquivo **init.sql** dentro do diretório Scripts, e rode no terminal **npm run init-db**:
+Acesse o painel do [Supabase](https://app.supabase.com/), vá até **SQL Editor** e rode manualmente no supabase ou dentro do próprio MVC edite o arquivo **init.sql** dentro do diretório Scripts, e rode no terminal **npm run init-db**:
 
 ```sql
 CREATE TABLE IF NOT EXISTS aluno (
