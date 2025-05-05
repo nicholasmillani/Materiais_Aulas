@@ -25,7 +25,7 @@ npm install express ejs
 
 ### 3. Configure o banco de dados PostgreSQL
 
-Crie um banco chamado `alunosdb` e adicione as seguintes configurações em um arquivo `.env`:
+Adicione as seguintes configurações em um arquivo `.env`:
 
 ```env
 DB_HOST=
