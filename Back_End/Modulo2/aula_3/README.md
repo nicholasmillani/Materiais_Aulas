@@ -304,3 +304,237 @@ Servidor rodando em http://localhost:3000
 - **Controller** → Recebe a requisição, executa lógica e responde.
 - **Config** → Guarda configurações de conexão.
 - **View** → Não está implementada neste exemplo, mas poderia ser feita com EJS.
+
+
+
+
+# 🧠 Parte 2 - Projeto CRUD com Node.js + PostgreSQL (Supabase)
+
+## 🎯 Objetivo
+
+Este projeto ensina como criar uma aplicação web com formulário que realiza operações **CRUD** — Criar, Ler (listar), Atualizar e Deletar registros — utilizando os seguintes recursos:
+
+- 🧱 Arquitetura MVC (Model-View-Controller): separa as responsabilidades em camadas organizadas.
+- 🟩 Node.js + Express: back-end em JavaScript com servidor HTTP leve.
+- 🛢️ PostgreSQL (via Supabase): banco de dados relacional gerenciado.
+- 🖼️ EJS (Embedded JavaScript): mecanismo para renderizar HTML com dados dinâmicos.
+
+---
+
+## 1. 🗃️ Criação da Tabela `aluno` no Supabase
+
+Acesse o painel do [Supabase](https://app.supabase.com/), vá até **SQL Editor** e cole o seguinte código:
+
+```sql
+CREATE TABLE IF NOT EXISTS aluno (
+  id SERIAL PRIMARY KEY,
+  nome TEXT NOT NULL,
+  email TEXT NOT NULL,
+  criado_em TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_aluno_email ON aluno (email);
+```
+
+> 🔧 Esse script cria a tabela `aluno` com os campos `id`, `nome`, `email` e a data de criação. Também é criado um índice para buscas rápidas pelo campo `email`.
+
+Clique em **Run** para executar a query.
+
+---
+
+## 2. ✅ Estrutura do Projeto
+
+```
+📦 mvc-boilerplate
+┣ 📂config         → Conexão com o banco (db.js)
+┣ 📂models         → Acesso aos dados (aluno.js)
+┣ 📂controllers    → Lógica da aplicação (alunoController.js)
+┣ 📂routes         → Rotas da aplicação (alunos.js)
+┣ 📂views          → Arquivos HTML renderizados com EJS
+┃ ┗ 📂alunos
+┃   ┗ 📜 index.ejs
+┣ 📜 app.js        → Arquivo principal que inicializa a aplicação
+┣ 📜 .env          → Variáveis de ambiente (credenciais do banco)
+┣ 📜 package.json  → Dependências do projeto
+```
+
+> 📌 Essa estrutura segue o padrão MVC, facilitando a manutenção e organização do código.
+
+---
+
+## 3. 📁 Arquivo `models/aluno.js`
+
+Responsável por interagir diretamente com o banco de dados Supabase:
+
+```javascript
+const db = require('../config/db');
+
+module.exports = {
+  async create(data) {
+    const query = 'INSERT INTO aluno (nome, email) VALUES ($1, $2)';
+    const values = [data.nome, data.email];
+    return db.query(query, values);
+  },
+
+  async findAll() {
+    const result = await db.query('SELECT * FROM aluno ORDER BY id ASC');
+    return result.rows;
+  },
+
+  async update(id, data) {
+    const query = 'UPDATE aluno SET nome = $1, email = $2 WHERE id = $3';
+    const values = [data.nome, data.email, id];
+    return db.query(query, values);
+  },
+
+  async delete(id) {
+    const query = 'DELETE FROM aluno WHERE id = $1';
+    return db.query(query, [id]);
+  }
+};
+```
+
+---
+
+## 4. 📁 Arquivo `controllers/alunoController.js`
+
+Controla o fluxo de dados entre o model e a view.
+
+```javascript
+const Aluno = require('../models/aluno');
+
+exports.index = async (req, res) => {
+  const alunos = await Aluno.findAll();
+  res.render('alunos/index', { alunos });
+};
+
+exports.store = async (req, res) => {
+  await Aluno.create(req.body);
+  res.redirect('/alunos');
+};
+
+exports.update = async (req, res) => {
+  const { id } = req.params;
+  await Aluno.update(id, req.body);
+  res.redirect('/alunos');
+};
+
+exports.destroy = async (req, res) => {
+  const { id } = req.params;
+  await Aluno.delete(id);
+  res.redirect('/alunos');
+};
+```
+
+---
+
+## 5. 📁 Arquivo `routes/alunos.js`
+
+Define as rotas para as operações CRUD.
+
+```javascript
+const express = require('express');
+const router = express.Router();
+const controller = require('../controllers/alunoController');
+
+router.get('/', controller.index);
+router.post('/', controller.store);
+router.post('/edit/:id', controller.update);
+router.post('/delete/:id', controller.destroy);
+
+module.exports = router;
+```
+
+---
+
+## 6. 📜 Arquivo `app.js`
+
+Configura o servidor Express e integra todas as rotas.
+
+```javascript
+const express = require('express');
+const app = express();
+const path = require('path');
+const alunosRoutes = require('./routes/alunos');
+const bodyParser = require('body-parser');
+require('dotenv').config();
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'));
+
+app.use('/alunos', alunosRoutes);
+
+app.get('/', (req, res) => {
+  res.redirect('/alunos');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
+});
+```
+
+---
+
+## 7. 📄 Arquivo `views/alunos/index.ejs`
+
+Renderiza a interface de cadastro e listagem de alunos.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>CRUD de Alunos</title>
+</head>
+<body>
+  <h1>Cadastro de Alunos</h1>
+
+  <form action="/alunos" method="POST">
+    <input name="nome" placeholder="Nome" required>
+    <input name="email" placeholder="Email" required>
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <hr>
+
+  <ul>
+    <% alunos.forEach(aluno => { %>
+      <li>
+        <%= aluno.nome %> - <%= aluno.email %>
+        <form action="/alunos/edit/<%= aluno.id %>" method="POST" style="display:inline">
+          <input name="nome" placeholder="Novo nome" required>
+          <input name="email" placeholder="Novo email" required>
+          <button type="submit">Editar</button>
+        </form>
+        <form action="/alunos/delete/<%= aluno.id %>" method="POST" style="display:inline">
+          <button type="submit">Apagar</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
+</body>
+</html>
+```
+
+---
+
+## ▶️ Como Rodar o Projeto Localmente
+
+1. Inicie o servidor:
+
+```bash
+node app.js
+```
+
+4. Acesse [http://localhost:3000](http://localhost:3000) no navegador.
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT.
+
