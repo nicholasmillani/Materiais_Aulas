@@ -276,9 +276,7 @@ VALUES
 
 ---
 
-## 🧪 Teste com REST Client
 
-Use o VSCode com a extensão REST Client para executar requisições via o arquivo `rest.http`.
 
 ---
 
