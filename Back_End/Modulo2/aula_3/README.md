@@ -306,6 +306,9 @@ Servidor rodando em http://localhost:3000
 - **View** → Não está implementada neste exemplo, mas poderia ser feita com EJS.
 
 
+---
+---
+---
 
 
 # 🧠 Parte 2 - Projeto CRUD com Node.js + PostgreSQL (Supabase)
