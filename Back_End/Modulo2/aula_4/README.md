@@ -11,7 +11,8 @@ Nesta etapa, o projeto evolui com a criação de relacionamentos entre tabelas p
 - Integração de dados relacionados na interface e backend
 
 ---
-Pré-requisito: Parte 2 da aula anterior funcionando corretamente.
+📌  Pré-requisito: Parte 2 da aula anterior funcionando corretamente.
+
 ---
 
 ## 1. 🗃️ Criação da Tabela `curso` e relacionamento com `aluno`
