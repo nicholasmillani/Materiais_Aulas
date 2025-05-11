@@ -12,6 +12,9 @@
 
 ## 1. 🧱 Atualize o `init.sql`
 
+> Criamos a tabela `curso` e adicionamos uma chave estrangeira `curso_id` na tabela `aluno`.
+> Isso estabelece um relacionamento 1:N entre cursos e alunos.
+
 ```sql
 CREATE TABLE IF NOT EXISTS curso (
   id SERIAL PRIMARY KEY,
@@ -26,6 +29,8 @@ ADD CONSTRAINT fk_curso FOREIGN KEY (curso_id) REFERENCES curso(id) ON DELETE SE
 ---
 
 ## 2. 📄 Crie `models/curso.js`
+
+> Este model fornece funções para listar todos os cursos e criar um novo curso no banco de dados.
 
 ```js
 const db = require('../config/db');
@@ -47,6 +52,9 @@ module.exports = {
 ---
 
 ## 3. 📄 Atualize `models/aluno.js`
+
+> Incluímos os métodos para inserir um aluno com `curso_id`, listar todos os alunos com nome do curso (JOIN),
+> e buscar alunos filtrando por um curso específico.
 
 ```js
 async create(data) {
@@ -82,6 +90,8 @@ async findByCurso(curso_id) {
 
 ## 4. 📄 Crie `controllers/cursoController.js`
 
+> Este controlador permite criar um novo curso através de um formulário HTML e redireciona de volta para `/alunos`.
+
 ```js
 const Curso = require('../models/curso');
 
@@ -95,6 +105,10 @@ exports.create = async (req, res) => {
 ---
 
 ## 5. 📄 Atualize `controllers/alunoController.js`
+
+> Modificamos o controlador para:
+> - Listar os cursos disponíveis junto com os alunos.
+> - Adicionar uma nova rota que retorna os alunos de um curso específico.
 
 ```js
 const Curso = require('../models/curso');
@@ -116,6 +130,8 @@ exports.byCurso = async (req, res) => {
 
 ## 6. 📄 Crie `routes/cursos.js`
 
+> Define uma nova rota POST para criar cursos.
+
 ```js
 const express = require('express');
 const router = express.Router();
@@ -130,6 +146,8 @@ module.exports = router;
 
 ## 7. 📄 Atualize `routes/alunos.js`
 
+> Adicionamos rota GET para buscar alunos de um curso específico.
+
 ```js
 router.get('/curso/:curso_id', controller.byCurso);
 ```
@@ -137,6 +155,8 @@ router.get('/curso/:curso_id', controller.byCurso);
 ---
 
 ## 8. 📄 Atualize `app.js`
+
+> Importamos as rotas de cursos e adicionamos ao Express.
 
 ```js
 const cursosRoutes = require('./routes/cursos');
@@ -147,7 +167,9 @@ app.use('/cursos', cursosRoutes);
 
 ## 9. 🖼 Atualize `views/alunos/index.ejs`
 
-### Formulário de seleção de curso:
+### Formulário de seleção de curso
+
+> Esse trecho gera um `select` com os cursos disponíveis, permitindo relacionar um aluno a um curso no cadastro.
 
 ```html
 <select name="curso_id">
@@ -158,7 +180,9 @@ app.use('/cursos', cursosRoutes);
 </select>
 ```
 
-### Formulário para criar novo curso:
+### Formulário para criar novo curso
+
+> Permite ao usuário adicionar um novo curso diretamente pela interface.
 
 ```html
 <h2>Cadastrar novo curso</h2>
