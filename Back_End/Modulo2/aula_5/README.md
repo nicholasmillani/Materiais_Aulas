@@ -14,6 +14,7 @@ Consolidar o entendimento da estrutura MVC (Model-View-Controller) por meio de p
 #### 1. No `models/curso.js`, adicione:
 
 ```js
+// Função no model para atualizar o nome de um curso pelo ID
 async update(id, nome) {
   const query = 'UPDATE curso SET nome = $1 WHERE id = $2 RETURNING *';
   const result = await db.query(query, [nome, id]);
@@ -24,6 +25,7 @@ async update(id, nome) {
 #### 2. No `controllers/cursoController.js`, adicione:
 
 ```js
+// Controller que recebe os dados do formulário e chama o model para atualizar o curso
 exports.update = async (req, res) => {
   const { id } = req.params;
   const { nome } = req.body;
@@ -35,12 +37,14 @@ exports.update = async (req, res) => {
 #### 3. No `routes/cursos.js`, adicione:
 
 ```js
+// Rota para enviar o formulário de edição de curso ao controller
 router.post('/edit/:id', controller.update);
 ```
 
 #### 4. Em `views/alunos/index.ejs`, adicione:
 
 ```ejs
+<!-- Loop para listar todos os cursos e permitir edição -->
 <% cursos.forEach(curso => { %>
   <form action="/cursos/edit/<%= curso.id %>" method="POST" style="display:inline;">
     <input name="nome" value="<%= curso.nome %>" required>
@@ -56,6 +60,7 @@ router.post('/edit/:id', controller.update);
 #### 1. No `models/curso.js`, adicione:
 
 ```js
+// Função no model que remove um curso do banco de dados pelo ID
 async delete(id) {
   await db.query('DELETE FROM curso WHERE id = $1', [id]);
 }
@@ -64,6 +69,7 @@ async delete(id) {
 #### 2. No `controllers/cursoController.js`, adicione:
 
 ```js
+// Controller que chama o model para deletar o curso e redireciona
 exports.delete = async (req, res) => {
   const { id } = req.params;
   await Curso.delete(id);
@@ -74,12 +80,14 @@ exports.delete = async (req, res) => {
 #### 3. Em `routes/cursos.js`, adicione:
 
 ```js
+// Rota para enviar o pedido de exclusão ao controller
 router.post('/delete/:id', controller.delete);
 ```
 
 #### 4. Em `views/alunos/index.ejs`, adicione:
 
 ```ejs
+<!-- Formulário para deletar um curso -->
 <form action="/cursos/delete/<%= curso.id %>" method="POST" style="display:inline;">
   <button type="submit" onclick="return confirm('Tem certeza que deseja excluir?')">🗑️</button>
 </form>
