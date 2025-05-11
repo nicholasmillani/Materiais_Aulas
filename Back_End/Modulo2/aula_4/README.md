@@ -1,213 +1,224 @@
 
-# Parte 3 — Relacionamento entre Tabelas, Chaves Estrangeiras e JOINs no CRUD
+# Parte 4 — Roteiro de Atividade: Models e Controllers com MVC
 
-## 🎯 Objetivo
+## 🎯 O que você vai aprender
 
-- Criar um relacionamento entre alunos e cursos (1:N).
-- Aplicar LEFT JOIN para exibir o nome do curso junto com os dados do aluno.
-- Permitir cadastro e listagem de cursos.
-- Permitir associar um curso ao aluno via formulário.
+Consolidar a compreensão prática e conceitual dos alunos sobre a separação de responsabilidades entre `models`, `controllers` e `views` no padrão MVC. Os alunos irão praticar a atualização e exclusão de cursos usando formulários, e refletir sobre a arquitetura do projeto.
 
 ---
 
-## 1. 🧱 Atualize o `init.sql`
+## 📘 Parte 4A — Mão na Massa: Melhorando nosso sistema com MVC
 
-> Criamos a tabela `curso` e adicionamos uma chave estrangeira `curso_id` na tabela `aluno`.
-> Isso estabelece um relacionamento 1:N entre cursos e alunos.
+### 💡 Cenário
 
-```sql
-CREATE TABLE IF NOT EXISTS curso (
-  id SERIAL PRIMARY KEY,
-  nome TEXT NOT NULL
-);
+Imagine que você foi chamado para melhorar um sistema de cadastro de alunos e cursos. Seu desafio nesta atividade será:
 
-ALTER TABLE aluno
-ADD COLUMN IF NOT EXISTS curso_id INTEGER,
-ADD CONSTRAINT fk_curso FOREIGN KEY (curso_id) REFERENCES curso(id) ON DELETE SET NULL;
-```
+1. Permitir que cursos já cadastrados possam ser **editados**.
+2. Permitir que cursos possam ser **excluídos**, respeitando o relacionamento com os alunos.
 
 ---
 
-## 2. 📄 Crie `models/curso.js`
+### 🛠 Tarefa 1 — Permitir que o nome de um curso seja editado
 
-> Este model fornece funções para listar todos os cursos e criar um novo curso no banco de dados.
+#### 1.1 — No `models/curso.js`
 
 ```js
-const db = require('../config/db');
-
-module.exports = {
-  async findAll() {
-    const result = await db.query('SELECT * FROM curso ORDER BY nome ASC');
-    return result.rows;
-  },
-
-  async create(nome) {
-    const query = 'INSERT INTO curso (nome) VALUES ($1) RETURNING *';
-    const result = await db.query(query, [nome]);
-    return result.rows[0];
-  }
-};
-```
-
----
-
-## 3. 📄 Atualize `models/aluno.js`
-
-> Incluímos os métodos para inserir um aluno com `curso_id`, listar todos os alunos com nome do curso (JOIN),
-> e buscar alunos filtrando por um curso específico.
-
-```js
-async create(data) {
-  const query = 'INSERT INTO aluno (nome, email, curso_id) VALUES ($1, $2, $3)';
-  const values = [data.nome, data.email, data.curso_id || null];
-  return db.query(query, values);
-},
-
-async findAllComCurso() {
-  const query = \`
-    SELECT aluno.id, aluno.nome, aluno.email, curso.nome AS curso
-    FROM aluno
-    LEFT JOIN curso ON aluno.curso_id = curso.id
-    ORDER BY aluno.id ASC
-  \`;
-  const result = await db.query(query);
-  return result.rows;
-},
-
-async findByCurso(curso_id) {
-  const query = \`
-    SELECT aluno.id, aluno.nome, aluno.email
-    FROM aluno
-    WHERE curso_id = $1
-    ORDER BY nome ASC
-  \`;
-  const result = await db.query(query, [curso_id]);
-  return result.rows;
+// Atualiza o nome de um curso com base no ID fornecido
+async update(id, nome) {
+  const query = 'UPDATE curso SET nome = $1 WHERE id = $2 RETURNING *';
+  const result = await db.query(query, [nome, id]);
+  return result.rows[0];
 }
 ```
 
 ---
 
-## 4. 📄 Crie `controllers/cursoController.js`
-
-> Este controlador permite criar um novo curso através de um formulário HTML e redireciona de volta para `/alunos`.
+#### 1.2 — No `controllers/cursoController.js`
 
 ```js
-const Curso = require('../models/curso');
-
-exports.create = async (req, res) => {
+// Controlador responsável por atualizar o curso chamando o model
+exports.update = async (req, res) => {
+  const { id } = req.params;
   const { nome } = req.body;
-  await Curso.create(nome);
+  await Curso.update(id, nome);
   res.redirect('/alunos');
 };
 ```
 
 ---
 
-## 5. 📄 Atualize `controllers/alunoController.js`
-
-> Modificamos o controlador para:
-> - Listar os cursos disponíveis junto com os alunos.
-> - Adicionar uma nova rota que retorna os alunos de um curso específico.
+#### 1.3 — No `routes/cursos.js`
 
 ```js
-const Curso = require('../models/curso');
+// Rota que envia dados do formulário de edição para o controller
+router.post('/edit/:id', controller.update);
+```
 
-exports.index = async (req, res) => {
-  const alunos = await Aluno.findAllComCurso();
-  const cursos = await Curso.findAll();
-  res.render('alunos/index', { alunos, cursos });
+---
+
+#### 1.4 — Em `views/alunos/index.ejs`
+
+```ejs
+<!-- Lista de cursos com formulário de edição embutido -->
+<% cursos.forEach(curso => { %>
+  <form action="/cursos/edit/<%= curso.id %>" method="POST" style="display: flex; gap: 10px; margin-bottom: 5px;">
+    <input name="nome" value="<%= curso.nome %>" required>
+    <button type="submit">✏️ Editar</button>
+  </form>
+<% }) %>
+```
+
+---
+
+### 🛠 Tarefa 2 — Permitir que um curso seja excluído
+
+#### 2.1 — No `models/curso.js`
+
+```js
+// Deleta um curso por ID — ON DELETE SET NULL evita erro em relacionamentos
+async delete(id) {
+  await db.query('DELETE FROM curso WHERE id = $1', [id]);
+}
+```
+
+---
+
+#### 2.2 — No `controllers/cursoController.js`
+
+```js
+// Controlador responsável por deletar o curso
+exports.delete = async (req, res) => {
+  const { id } = req.params;
+  await Curso.delete(id);
+  res.redirect('/alunos');
 };
-
-exports.byCurso = async (req, res) => {
-  const { curso_id } = req.params;
-  const alunos = await Aluno.findByCurso(curso_id);
-  res.json(alunos);
-};
 ```
 
 ---
 
-## 6. 📄 Crie `routes/cursos.js`
-
-> Define uma nova rota POST para criar cursos.
+#### 2.3 — No `routes/cursos.js`
 
 ```js
-const express = require('express');
-const router = express.Router();
-const controller = require('../controllers/cursoController');
-
-router.post('/', controller.create);
-
-module.exports = router;
+// Rota para deletar curso via POST
+router.post('/delete/:id', controller.delete);
 ```
 
 ---
 
-## 7. 📄 Atualize `routes/alunos.js`
+#### 2.4 — Em `views/alunos/index.ejs`
 
-> Adicionamos rota GET para buscar alunos de um curso específico.
-
-```js
-router.get('/curso/:curso_id', controller.byCurso);
-```
-
----
-
-## 8. 📄 Atualize `app.js`
-
-> Importamos as rotas de cursos e adicionamos ao Express.
-
-```js
-const cursosRoutes = require('./routes/cursos');
-app.use('/cursos', cursosRoutes);
-```
-
----
-
-## 9. 🖼 Atualize `views/alunos/index.ejs`
-
-### Formulário de seleção de curso
-
-> Esse trecho gera um `select` com os cursos disponíveis, permitindo relacionar um aluno a um curso no cadastro.
-
-```html
-<select name="curso_id">
-  <option value="">Selecione um curso</option>
-  <% cursos.forEach(curso => { %>
-    <option value="<%= curso.id %>"><%= curso.nome %></option>
-  <% }) %>
-</select>
-```
-
-### Formulário para criar novo curso
-
-> Permite ao usuário adicionar um novo curso diretamente pela interface.
-
-```html
-<h2>Cadastrar novo curso</h2>
-<form action="/cursos" method="POST">
-  <input name="nome" placeholder="Nome do curso" required>
-  <button type="submit">Adicionar Curso</button>
+```ejs
+<!-- Formulário para deletar curso -->
+<form action="/cursos/delete/<%= curso.id %>" method="POST" style="display:inline;">
+  <button type="submit" onclick="return confirm('Tem certeza que deseja excluir este curso?')">🗑️ Excluir</button>
 </form>
 ```
 
 ---
 
-## ▶️ Como Rodar o Projeto
+### 📌 O que esperamos que você consiga fazer
 
-```bash
-npm run init-db
-node app.js
-```
-
-Acesse: [http://localhost:3000](http://localhost:3000)
+- Cursos podem ser editados e excluídos pela interface.
+- A estrutura MVC é respeitada com clareza.
+- O aluno compreende o fluxo view → controller → model → banco.
 
 ---
 
-## ✅ Resultado Esperado
+## 📗 Parte 4B — Entenda a Teoria por Trás: O que é MVC?
 
-- Cadastro de cursos via formulário.
-- Associação de curso ao cadastrar aluno.
-- Listagem de alunos com nome do curso associado.
-- Filtro de alunos por curso via rota `/alunos/curso/:id`.
+### 🎯 Objetivo
+
+Refletir conceitualmente sobre a separação de responsabilidades no padrão MVC com exemplos práticos e analogias.
+
+---
+
+### 1. 🧠 Mas afinal, o que é MVC?
+
+**MVC** é um padrão que organiza aplicações em três camadas:
+
+- **Model** → cuida dos dados e regras de negócio.
+- **View** → apresenta a interface ao usuário.
+- **Controller** → recebe comandos do usuário, manipula os models e atualiza a view.
+
+---
+
+### 🧩 Analogia Prática
+
+Imagine um restaurante:
+
+- **Model** → é o cozinheiro: acessa dados, prepara o prato.
+- **Controller** → é o garçom: pega o pedido e entrega ao cliente.
+- **View** → é o cardápio e a comida no prato: o que o usuário vê e interage.
+
+---
+
+### 2. 🧱 Como organizamos o projeto
+
+```
+project/
+├── models/
+│   ├── aluno.js           # Lógica de acesso ao banco de alunos
+│   └── curso.js           # Lógica de acesso ao banco de cursos
+├── controllers/
+│   ├── alunoController.js # Controla ações relacionadas aos alunos
+│   └── cursoController.js # Controla ações relacionadas aos cursos
+├── views/
+│   └── alunos/index.ejs   # Interface com formulários
+└── routes/
+    ├── alunos.js          # Rotas dos alunos
+    └── cursos.js          # Rotas dos cursos
+```
+
+---
+
+### 3. 🔄 Como as partes conversam entre si
+
+**Exemplo: Cadastro de Curso**
+
+```
+Usuário preenche formulário (view)
+        ↓
+Controller recebe (cursoController.create)
+        ↓
+Model insere no banco (Curso.create)
+        ↓
+Banco de dados armazena e devolve resultado
+        ↓
+Controller redireciona para página de listagem
+```
+
+---
+
+### 4. ✍️ Reforçando com prática
+
+#### Desafio 1 — Análise de código
+
+- Abra `alunoController.js` e `cursoController.js`
+- Comente no código:
+  - Onde o controller chama o model?
+  - O que é enviado à view?
+
+#### Desafio 2 — Criar novo endpoint
+
+- Crie um endpoint que retorna todos os cursos em formato JSON.
+- Crie a rota GET `/cursos/json`
+- No controller, utilize `Curso.findAll()` e `res.json(...)`.
+
+---
+
+### 5. 📌 Dicas para você nunca esquecer
+
+- 🔹 O **model** só se comunica com o banco, não manipula views.
+- 🔹 O **controller** conecta a view ao model, mas não tem SQL direto.
+- 🔹 A **view** apenas mostra dados, sem lógica de negócio.
+
+---
+
+### 📌 O que esperamos que você consiga fazer
+
+- Compreensão teórica e prática clara do padrão MVC.
+- Capacidade de modificar e estender controllers e models com autonomia.
+- Clareza na divisão de responsabilidades entre camadas.
+
+---
+
