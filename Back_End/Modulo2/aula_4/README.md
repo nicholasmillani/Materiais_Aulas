@@ -1,23 +1,16 @@
 
-# 🧠 Parte 3 - Relacionamento entre Tabelas, Chaves Estrangeiras e JOINs no CRUD
+# Parte 3 — Relacionamento entre Tabelas, Chaves Estrangeiras e JOINs no CRUD
 
 ## 🎯 Objetivo
 
-Nesta etapa, o projeto evolui com a criação de relacionamentos entre tabelas por meio de **chaves estrangeiras**, aplicação de **JOINs SQL** e **cadastro dinâmico de dados relacionados**. O foco é consolidar os seguintes conceitos:
-
-- Relacionamento 1:N entre tabelas
-- Criação e uso de chave estrangeira
-- Consultas com `JOIN` (LEFT JOIN)
-- Integração de dados relacionados na interface e backend
-
----
-📌  Pré-requisito: Parte 2 da aula anterior funcionando corretamente.
+- Criar um relacionamento entre alunos e cursos (1:N).
+- Aplicar LEFT JOIN para exibir o nome do curso junto com os dados do aluno.
+- Permitir cadastro e listagem de cursos.
+- Permitir associar um curso ao aluno via formulário.
 
 ---
 
-## 1. 🗃️ Criação da Tabela `curso` e relacionamento com `aluno`
-
-Atualizamos o arquivo `init.sql` com:
+## 1. 🧱 Atualize o `init.sql`
 
 ```sql
 CREATE TABLE IF NOT EXISTS curso (
@@ -26,47 +19,42 @@ CREATE TABLE IF NOT EXISTS curso (
 );
 
 ALTER TABLE aluno
-ADD COLUMN curso_id INTEGER,
+ADD COLUMN IF NOT EXISTS curso_id INTEGER,
 ADD CONSTRAINT fk_curso FOREIGN KEY (curso_id) REFERENCES curso(id) ON DELETE SET NULL;
 ```
 
-🔧 **Explicação**:
-- Criamos a tabela `curso` para representar os cursos disponíveis.
-- A coluna `curso_id` em `aluno` cria o vínculo entre as tabelas (1 curso → muitos alunos).
-- O `ON DELETE SET NULL` garante que, se o curso for excluído, o aluno permanece no banco com valor nulo no campo `curso_id`.
+---
+
+## 2. 📄 Crie `models/curso.js`
+
+```js
+const db = require('../config/db');
+
+module.exports = {
+  async findAll() {
+    const result = await db.query('SELECT * FROM curso ORDER BY nome ASC');
+    return result.rows;
+  },
+
+  async create(nome) {
+    const query = 'INSERT INTO curso (nome) VALUES ($1) RETURNING *';
+    const result = await db.query(query, [nome]);
+    return result.rows[0];
+  }
+};
+```
 
 ---
 
-## 2. ✅ Novos Arquivos e Atualizações na Estrutura do Projeto
-
-Adições à estrutura do projeto:
-
-```
-📂models
-┣ 📜 curso.js       → NOVO: model para manipular cursos
-📂controllers
-┣ 📜 cursoController.js → NOVO: lógica de criação de cursos
-📂routes
-┣ 📜 cursos.js      → NOVO: rota para cadastro de cursos
-```
-
-📌 **Comentário**: Essa modularização segue o padrão MVC, mantendo a organização clara com base em responsabilidades. Agora temos um módulo completo também para `curso`.
-
----
-
-## 3. 📁 Atualização no model `aluno.js`
+## 3. 📄 Atualize `models/aluno.js`
 
 ```js
 async create(data) {
   const query = 'INSERT INTO aluno (nome, email, curso_id) VALUES ($1, $2, $3)';
   const values = [data.nome, data.email, data.curso_id || null];
   return db.query(query, values);
-}
-```
+},
 
-📌 **Comentário**: adicionamos `curso_id` ao insert de aluno.
-
-```js
 async findAllComCurso() {
   const query = \`
     SELECT aluno.id, aluno.nome, aluno.email, curso.nome AS curso
@@ -76,12 +64,8 @@ async findAllComCurso() {
   \`;
   const result = await db.query(query);
   return result.rows;
-}
-```
+},
 
-📌 **Comentário**: novo método com `LEFT JOIN` para exibir nome do curso junto ao aluno, mesmo que não esteja vinculado.
-
-```js
 async findByCurso(curso_id) {
   const query = \`
     SELECT aluno.id, aluno.nome, aluno.email
@@ -94,38 +78,33 @@ async findByCurso(curso_id) {
 }
 ```
 
-📌 **Comentário**: novo método que permite listar alunos filtrados por curso específico.
+---
+
+## 4. 📄 Crie `controllers/cursoController.js`
+
+```js
+const Curso = require('../models/curso');
+
+exports.create = async (req, res) => {
+  const { nome } = req.body;
+  await Curso.create(nome);
+  res.redirect('/alunos');
+};
+```
 
 ---
 
-## 4. 📁 Novo model `curso.js`
+## 5. 📄 Atualize `controllers/alunoController.js`
 
 ```js
-async findAll() {
-  const result = await db.query('SELECT * FROM curso ORDER BY nome ASC');
-  return result.rows;
-}
+const Curso = require('../models/curso');
 
-async create(nome) {
-  const query = 'INSERT INTO curso (nome) VALUES ($1) RETURNING *';
-  const result = await db.query(query, [nome]);
-  return result.rows[0];
-}
-```
+exports.index = async (req, res) => {
+  const alunos = await Aluno.findAllComCurso();
+  const cursos = await Curso.findAll();
+  res.render('alunos/index', { alunos, cursos });
+};
 
-📌 **Comentário**: implementa listagem e criação de cursos.
-
----
-
-## 5. 📁 Atualização no controller `alunoController.js`
-
-```js
-const cursos = await Curso.findAll();
-```
-
-📌 **Comentário**: adicionamos a busca de todos os cursos para popular o `select` do formulário de aluno.
-
-```js
 exports.byCurso = async (req, res) => {
   const { curso_id } = req.params;
   const alunos = await Aluno.findByCurso(curso_id);
@@ -133,45 +112,42 @@ exports.byCurso = async (req, res) => {
 };
 ```
 
-📌 **Comentário**: nova rota para retornar apenas os alunos de um curso específico (ex: API REST filtrável).
-
 ---
 
-## 6. 📁 Novo controller `cursoController.js`
+## 6. 📄 Crie `routes/cursos.js`
 
 ```js
-exports.create = async (req, res) => {
-  const { nome } = req.body;
-  const curso = await Curso.create(nome);
-  res.redirect('/alunos');
-};
-```
+const express = require('express');
+const router = express.Router();
+const controller = require('../controllers/cursoController');
 
-📌 **Comentário**: responsável por cadastrar cursos a partir da interface HTML.
+router.post('/', controller.create);
+
+module.exports = router;
+```
 
 ---
 
-## 7. 📁 Novas rotas
+## 7. 📄 Atualize `routes/alunos.js`
 
-**alunos.js**
 ```js
 router.get('/curso/:curso_id', controller.byCurso);
 ```
 
-📌 **Comentário**: rota adicional para listar alunos de um curso específico (útil para AJAX futuramente).
+---
 
-**cursos.js**
+## 8. 📄 Atualize `app.js`
+
 ```js
-router.post('/', controller.create);
+const cursosRoutes = require('./routes/cursos');
+app.use('/cursos', cursosRoutes);
 ```
-
-📌 **Comentário**: rota para criar cursos a partir do formulário.
 
 ---
 
-## 8. 📄 Atualização da view `views/alunos/index.ejs`
+## 9. 🖼 Atualize `views/alunos/index.ejs`
 
-Adicionamos no formulário de aluno:
+### Formulário de seleção de curso:
 
 ```html
 <select name="curso_id">
@@ -182,9 +158,7 @@ Adicionamos no formulário de aluno:
 </select>
 ```
 
-📌 **Comentário**: nova interface para associar um curso ao aluno na criação ou edição.
-
-Também criamos um novo formulário para adicionar cursos:
+### Formulário para criar novo curso:
 
 ```html
 <h2>Cadastrar novo curso</h2>
@@ -194,23 +168,22 @@ Também criamos um novo formulário para adicionar cursos:
 </form>
 ```
 
-📌 **Comentário**: isso permite ao usuário criar cursos diretamente pela interface, facilitando o preenchimento dinâmico da lista no `select`.
-
 ---
 
-## ▶️ Como Rodar o Projeto Localmente
+## ▶️ Como Rodar o Projeto
 
-1. Rode o script para recriar o banco:
 ```bash
 npm run init-db
-```
-
-2. Inicie o servidor:
-```bash
 node app.js
 ```
 
-3. Acesse:
-```
-http://localhost:3000
-```
+Acesse: [http://localhost:3000](http://localhost:3000)
+
+---
+
+## ✅ Resultado Esperado
+
+- Cadastro de cursos via formulário.
+- Associação de curso ao cadastrar aluno.
+- Listagem de alunos com nome do curso associado.
+- Filtro de alunos por curso via rota `/alunos/curso/:id`.
