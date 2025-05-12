@@ -299,17 +299,6 @@ app.use('/cursos', cursosRoutes);
 </html>
 
 ```
-
-### Formulário para criar novo curso
-
-> Permite ao usuário adicionar um novo curso diretamente pela interface.
-
-```html
-<h2>Cadastrar novo curso</h2>
-<form action="/cursos" method="POST">
-  <input name="nome" placeholder="Nome do curso" required>
-  <button type="submit">Adicionar Curso</button>
-</form>
 ```
 
 ---
