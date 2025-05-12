@@ -204,7 +204,7 @@ module.exports = router;
 
 ---
 
-## 8. 📄 Atualize `app.js`
+## 8. 📄 Deixe o mesmo conforme abaixo `app.js`
 
 > Importamos as rotas de cursos e adicionamos ao Express.
 
