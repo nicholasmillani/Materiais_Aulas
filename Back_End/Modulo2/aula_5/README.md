@@ -103,107 +103,210 @@ router.post('/delete/:id', controller.delete);
 
 ---
 
-# Parte 4B — Entendendo a Estrutura MVC: Models e Controllers na Prática
+# Parte 4B — # 👨‍🏫 Criando o Recurso "Professores" com Node.js e MVC
 
 ## 🎯 Objetivo
-
-Compreender a divisão de responsabilidades entre `models` e `controllers` usando o padrão MVC, destacando seu papel na organização do código e na interação entre banco de dados e interface.
-
----
-
-## 1. 🧠 Conceito Introdutório
-
-**MVC** é uma arquitetura que separa a lógica da aplicação em três camadas:
-
-- **Model** → Regras de negócio e acesso aos dados.
-- **View** → Interface apresentada ao usuário.
-- **Controller** → Lógica de controle que conecta model e view.
-
-### 🧩 Analogia:
-
-Imagine um restaurante:
-
-- O **model** é o cozinheiro (prepara os dados).
-- O **controller** é o garçom (leva o pedido e traz a comida).
-- A **view** é o cardápio e o prato servido ao cliente.
+Adicionar ao sistema a funcionalidade de **cadastrar, listar, editar e excluir professores**, utilizando o padrão de arquitetura **MVC (Model-View-Controller)** no projeto Node.js com EJS.
 
 ---
 
-## 2. 🧱 Estrutura Padrão do Projeto
+## 📁 Estrutura de Pastas
 
 ```
-project/
-│
-├── models/
-│   ├── aluno.js         ← lógica de acesso ao banco para aluno
-│   └── curso.js         ← lógica de acesso ao banco para curso
-│
+projeto/
 ├── controllers/
-│   ├── alunoController.js  ← coordena os dados dos alunos
-│   └── cursoController.js  ← coordena os dados dos cursos
-│
+│   └── professorController.js
+├── models/
+│   └── professor.js
+├── routes/
+│   └── professores.js
 ├── views/
-│   └── alunos/index.ejs    ← interface com formulário e listagem
-│
-└── routes/
-    ├── alunos.js           ← define as rotas dos alunos
-    └── cursos.js           ← define as rotas dos cursos
+│   └── professores/
+│       └── index.ejs
+└── app.js
 ```
 
 ---
 
-## 3. 🧩 Explicação Visual do Fluxo MVC
+## ✅ Passo a Passo
 
-**Exemplo: Cadastro de um curso pelo formulário**
+### 1️⃣ Criar o Model: `models/professor.js`
 
+```js
+const db = require('../db');
+
+module.exports = {
+  // Listar todos os professores
+  async findAll() {
+    const result = await db.query('SELECT * FROM professor ORDER BY nome ASC');
+    return result.rows;
+  },
+
+  // Criar um novo professor
+  async create(nome, email) {
+    const result = await db.query(
+      'INSERT INTO professor (nome, email) VALUES ($1, $2) RETURNING *',
+      [nome, email]
+    );
+    return result.rows[0];
+  },
+
+  // Atualizar um professor existente
+  async update(id, nome, email) {
+    const result = await db.query(
+      'UPDATE professor SET nome = $1, email = $2 WHERE id = $3 RETURNING *',
+      [nome, email, id]
+    );
+    return result.rows[0];
+  },
+
+  // Deletar um professor
+  async delete(id) {
+    await db.query('DELETE FROM professor WHERE id = $1', [id]);
+  }
+};
 ```
-Usuário envia formulário (view)
-        ↓
-cursoController.create() (controller)
-        ↓
-Curso.create(nome) (model)
-        ↓
-INSERT INTO curso (nome) VALUES (...) (SQL)
-        ↓
-Redireciona para /alunos com dados atualizados
-```
-
-🧠 O controller é o cérebro que decide qual função do model será usada com base no que o usuário faz na view.
 
 ---
 
-## 4. 🛠 Atividade Prática Guiada
+### 2️⃣ Criar o Controller: `controllers/professorController.js`
 
-### Desafio 1 — Entendendo os papéis
+```js
+const Professor = require('../models/professor');
 
-Em duplas, abra `alunoController.js` e destaque com comentários:
+// Listar todos os professores
+exports.index = async (req, res) => {
+  const professores = await Professor.findAll();
+  res.render('professores/index', { professores });
+};
 
-- Onde o controller está chamando o model.
-- Quais dados são enviados para a view.
+// Criar novo professor
+exports.create = async (req, res) => {
+  const { nome, email } = req.body;
+  await Professor.create(nome, email);
+  res.redirect('/professores');
+};
 
-Depois, faça o mesmo com `cursoController.js`.
+// Atualizar dados do professor
+exports.update = async (req, res) => {
+  const { id } = req.params;
+  const { nome, email } = req.body;
+  await Professor.update(id, nome, email);
+  res.redirect('/professores');
+};
 
-### Desafio 2 — Novo endpoint
-
-Crie um novo método no controller para deletar um curso:
-
-- No model: `async delete(id)`
-- No controller: `exports.delete = async (req, res) => { ... }`
-- Na rota: `router.post('/delete/:id', controller.delete);`
-- Na view: botão de deletar ao lado de cada curso.
+// Deletar professor
+exports.delete = async (req, res) => {
+  const { id } = req.params;
+  await Professor.delete(id);
+  res.redirect('/professores');
+};
+```
 
 ---
 
-## 5. 🧭 Roteiro de Reforço Didático
+### 3️⃣ Criar as Rotas: `routes/professores.js`
 
-- 🔹 O **model** nunca tem `res.send()` ou `res.render()` → ele só se comunica com o banco.
-- 🔹 O **controller** nunca tem SQL direto → ele só chama funções do model e responde à view.
-- 🔹 A **view** nunca tem lógica de acesso ao banco → ela só exibe os dados recebidos.
+```js
+const express = require('express');
+const router = express.Router();
+const controller = require('../controllers/professorController');
+
+// Rota principal
+router.get('/', controller.index);
+
+// Criar novo professor
+router.post('/', controller.create);
+
+// Editar professor
+router.post('/edit/:id', controller.update);
+
+// Deletar professor
+router.post('/delete/:id', controller.delete);
+
+module.exports = router;
+```
+
+---
+
+### 4️⃣ Criar a View: `views/professores/index.ejs`
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Professores</title>
+</head>
+<body>
+  <h1>Cadastro de Professores</h1>
+
+  <!-- Formulário para adicionar professor -->
+  <form action="/professores" method="POST">
+    <input name="nome" placeholder="Nome do professor" required>
+    <input name="email" placeholder="Email do professor" required>
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <hr>
+
+  <h2>Lista de Professores</h2>
+  <% professores.forEach(prof => { %>
+    <!-- Editar professor -->
+    <form action="/professores/edit/<%= prof.id %>" method="POST" style="display:inline;">
+      <input name="nome" value="<%= prof.nome %>" required>
+      <input name="email" value="<%= prof.email %>" required>
+      <button type="submit">✏️</button>
+    </form>
+
+    <!-- Deletar professor -->
+    <form action="/professores/delete/<%= prof.id %>" method="POST" style="display:inline;">
+      <button type="submit" onclick="return confirm('Tem certeza que deseja excluir?')">🗑️</button>
+    </form>
+    <br>
+  <% }) %>
+</body>
+</html>
+```
+
+---
+
+### 5️⃣ Registrar a Rota no `app.js`
+
+No arquivo principal do seu projeto (geralmente `app.js` ou `index.js`), adicione:
+
+```js
+const professoresRoutes = require('./routes/professores');
+app.use('/professores', professoresRoutes);
+```
 
 ---
 
 ## ✅ Resultado Esperado
 
-- Aluno entende o papel de cada camada na prática.
-- Aluno consegue criar novos métodos nos `models` e `controllers`.
-- Aluno compreende o fluxo entre formulário, controller e banco de dados.
+Acesse no navegador:
+
+```
+http://localhost:3000/professores
+```
+
+Você poderá:
+
+- ✅ Criar novos professores
+- ✅ Ver a lista de professores cadastrados
+- ✅ Editar nome e e-mail dos professores
+- ✅ Deletar qualquer professor
+
+---
+
+## 💡 Dica Extra
+
+> Este roteiro pode ser facilmente adaptado para outros recursos como `disciplinas`, `turmas`, `notas`, etc.  
+> Basta replicar a estrutura de `Model`, `Controller`, `Routes` e `View` com os nomes apropriados.
+
+---
+
+## 👨‍🏫 Autor
+
+Professor Cristiano Benites – Inteli / Estiam Paris  
+Desenvolvido para alunos em formação prática de sistemas MVC com Node.js.
