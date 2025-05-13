@@ -103,7 +103,7 @@ router.post('/delete/:id', controller.delete);
 
 ---
 
-# Parte 4B — # 👨‍🏫 Criando o Recurso "Professores" com Node.js e MVC
+# Parte 4B — # 👨‍🏫 Roteiro Prático: Criando o Recurso "Professores" com Node.js e MVC
 
 ## 🎯 Objetivo
 Adicionar ao sistema a funcionalidade de **cadastrar, listar, editar e excluir professores**, utilizando o padrão de arquitetura **MVC (Model-View-Controller)** no projeto Node.js com EJS.
@@ -123,7 +123,23 @@ projeto/
 ├── views/
 │   └── professores/
 │       └── index.ejs
+└── config/
+    └── db.js
 └── app.js
+```
+
+---
+
+## 🛠 Script SQL para criar a tabela `professor`
+
+Antes de começar o desenvolvimento, execute o seguinte script no seu banco de dados PostgreSQL:
+
+```sql
+CREATE TABLE professor (
+  id SERIAL PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  email VARCHAR(150) NOT NULL
+);
 ```
 
 ---
@@ -133,7 +149,7 @@ projeto/
 ### 1️⃣ Criar o Model: `models/professor.js`
 
 ```js
-const db = require('../db');
+const db = require('../config/db');
 
 module.exports = {
   // Listar todos os professores
