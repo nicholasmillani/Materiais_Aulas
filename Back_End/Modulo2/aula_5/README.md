@@ -289,7 +289,7 @@ module.exports = router;
 
 ### 5️⃣ Registrar a Rota no `app.js`
 
-No arquivo principal do seu projeto (geralmente `app.js` ou `index.js`), adicione:
+No arquivo principal do seu projeto (geralmente `app.js` adicione:
 
 ```js
 const professoresRoutes = require('./routes/professores');
