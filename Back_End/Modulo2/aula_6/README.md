@@ -190,20 +190,17 @@ Você pode criar uma página HTML simples (com EJS) que consome os dados da API 
 ```
 
 ```
-📘 Como melhorar a reflexão no README dos alunos
-Você pode pedir algo como:
+📘 Responda as perguntas abaixo e favor inserir no readme quando for fazer a entrega via Github.
 
-“No final, edite seu README.md pessoal explicando:
+O que você implementou?
 
-O que você implementou
+Como funcionam os endpoints que criou (GET, POST)?
 
-Como funcionam os endpoints que criou (GET, POST)
+O que acontece em cada camada (model, controller, rota)?
 
-O que acontece em cada camada (model, controller, rota)
+O que deu errado e como resolveu (se houve erro)?
 
-O que deu errado e como resolveu (se houve erro)
-
-Como testou os dados (Postman, navegador, HTML com fetch)”
+Como testou os dados (Postman, navegador, HTML com fetch)?
 ```
 
 ```
