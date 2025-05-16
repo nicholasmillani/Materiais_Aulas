@@ -189,6 +189,21 @@ Você pode criar uma página HTML simples (com EJS) que consome os dados da API 
 </body>
 ```
 
+```
+📘 Como melhorar a reflexão no README dos alunos
+Você pode pedir algo como:
+
+“No final, edite seu README.md pessoal explicando:
+
+O que você implementou
+
+Como funcionam os endpoints que criou (GET, POST)
+
+O que acontece em cada camada (model, controller, rota)
+
+O que deu errado e como resolveu (se houve erro)
+
+Como testou os dados (Postman, navegador, HTML com fetch)”
 ---
 
 ## ✅ Conclusão
