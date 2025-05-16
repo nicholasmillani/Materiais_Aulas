@@ -204,7 +204,9 @@ O que acontece em cada camada (model, controller, rota)
 O que deu errado e como resolveu (se houve erro)
 
 Como testou os dados (Postman, navegador, HTML com fetch)”
----
+```
+
+```
 
 ## ✅ Conclusão
 
