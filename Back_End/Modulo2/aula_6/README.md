@@ -1,3 +1,4 @@
+
 # 🚀 Projeto Back-end II — Endpoints de Leitura e Escrita com JSON
 
 Este repositório contém um projeto baseado na arquitetura MVC em Node.js com PostgreSQL. O foco desta etapa é a criação de **endpoints RESTful** que trabalham com **entrada e saída de dados no formato JSON**.
@@ -30,24 +31,31 @@ projeto/
 └── app.js           # Arquivo principal do projeto
 ```
 
+> 💡 **Dica pedagógica:** Se você ainda não criou os arquivos `aluno.js`, `alunoController.js`, e `alunos.js`, crie agora dentro de suas respectivas pastas. Nomeie sempre com letras minúsculas e evite espaços.
+
+---
+
+## 🧭 Como o fluxo funciona?
+
+1. O usuário faz uma requisição para uma rota, como `/alunos/api`.
+2. A rota encaminha a requisição para o `controller`.
+3. O controller processa os dados e se comunica com o `model`, que acessa o banco de dados.
+4. O controller então retorna uma resposta ao navegador ou API client (Postman, Insomnia).
+
 ---
 
 ## 🧱 Etapa 1 — Criar o Controller com Endpoints JSON
 
-Nesta etapa, vamos construir os métodos no controller responsáveis por responder às requisições via JSON.
+```javascript
+// controllers/alunoController.js
 
-### Exemplo: `controllers/alunoController.js`
-
-```js
 const Aluno = require('../models/aluno');
 
-// Lista todos os alunos no formato JSON
 exports.apiList = async (req, res) => {
   const alunos = await Aluno.findAll();
   res.json(alunos);
 };
 
-// Busca um aluno por ID
 exports.apiGetById = async (req, res) => {
   const { id } = req.params;
   const aluno = await Aluno.findById(id);
@@ -57,7 +65,6 @@ exports.apiGetById = async (req, res) => {
   res.json(aluno);
 };
 
-// Cria um novo aluno a partir de dados JSON
 exports.apiCreate = async (req, res) => {
   const { nome, idade } = req.body;
   const novo = await Aluno.create(nome, idade);
@@ -69,30 +76,23 @@ exports.apiCreate = async (req, res) => {
 
 ## 📌 Etapa 2 — Criar as Rotas
 
-As rotas são os caminhos que o navegador ou o Postman irão acessar para chamar os métodos do controller.
+```javascript
+// routes/alunos.js
 
-### Exemplo: `routes/alunos.js`
-
-```js
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/alunoController');
 
-// Rota para listar alunos
 router.get('/api', controller.apiList);
-
-// Rota para buscar aluno por ID
 router.get('/api/:id', controller.apiGetById);
-
-// Rota para criar novo aluno via JSON
 router.post('/api', controller.apiCreate);
 
 module.exports = router;
 ```
 
-### E no `app.js`, registre a rota:
+```javascript
+// app.js
 
-```js
 const alunosRoutes = require('./routes/alunos');
 app.use('/alunos', alunosRoutes);
 ```
@@ -101,27 +101,22 @@ app.use('/alunos', alunosRoutes);
 
 ## 🧠 Etapa 3 — Criar os Métodos no Model
 
-O model representa o acesso direto ao banco de dados. Aqui criamos funções que serão chamadas pelo controller.
+```javascript
+// models/aluno.js
 
-### Exemplo: `models/aluno.js`
-
-```js
 const db = require('../config/db');
 
 module.exports = {
-  // Busca todos os alunos no banco
   async findAll() {
     const result = await db.query('SELECT * FROM aluno ORDER BY nome ASC');
     return result.rows;
   },
 
-  // Busca aluno específico pelo ID
   async findById(id) {
     const result = await db.query('SELECT * FROM aluno WHERE id = $1', [id]);
     return result.rows[0];
   },
 
-  // Insere novo aluno
   async create(nome, idade) {
     const result = await db.query(
       'INSERT INTO aluno (nome, idade) VALUES ($1, $2) RETURNING *',
@@ -136,18 +131,9 @@ module.exports = {
 
 ## 🧪 Etapa 4 — Testando com Postman
 
-### Requisição GET (listar alunos)
-
-- URL: `http://localhost:3000/alunos/api`
-
-### Requisição GET por ID
-
-- URL: `http://localhost:3000/alunos/api/1`
-
-### Requisição POST (criar novo aluno)
-
-- URL: `http://localhost:3000/alunos/api`
-- Body (JSON):
+- `GET /alunos/api` → Lista alunos
+- `GET /alunos/api/:id` → Busca aluno por ID
+- `POST /alunos/api` com body:
 ```json
 {
   "nome": "Lucas Silva",
@@ -155,24 +141,33 @@ module.exports = {
 }
 ```
 
-Use o Postman ou Insomnia para testar suas rotas.
+---
+
+## ✏️ Miniatividade
+
+Crie um endpoint `GET` para buscar alunos com idade > 18.
+
+- Rota: `/alunos/api/maiores`
+- Crie um método `findByMaiorIdade` no `model`.
 
 ---
 
-## 🔁 Etapa 5 — Repita a estrutura para cursos e professores
+## 📄 Como documentar endpoints manualmente
 
-Crie os arquivos:
-
-- `models/curso.js`, `controllers/cursoController.js`, `routes/cursos.js`
-- `models/professor.js`, `controllers/professorController.js`, `routes/professores.js`
-
-Use o mesmo padrão adotado para `aluno`.
+- **Rota:** `/alunos/api`
+- **Método:** `GET`
+- **Entrada:** nenhuma
+- **Saída:** lista de alunos
+- **Exemplo:**
+```json
+[
+  { "id": 1, "nome": "Lucas", "idade": 20 }
+]
+```
 
 ---
 
-## 🖥️ Etapa 6 — Visualizando com HTML + fetch (opcional)
-
-Você pode criar uma página HTML simples (com EJS) que consome os dados da API via JavaScript:
+## 🖥️ Etapa 5 — HTML + fetch
 
 ```html
 <script>
@@ -181,36 +176,49 @@ Você pode criar uma página HTML simples (com EJS) que consome os dados da API 
     const dados = await res.json();
     document.getElementById('saida').textContent = JSON.stringify(dados, null, 2);
   }
-</script>
 
+  async function enviarAluno() {
+    await fetch('/alunos/api', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome: 'João', idade: 22 })
+    });
+  }
+</script>
 <body onload="carregarAlunos()">
+  <button onclick="enviarAluno()">Adicionar João</button>
   <h2>Lista de Alunos</h2>
   <pre id="saida"></pre>
 </body>
 ```
 
-```
-📘 Responda as perguntas abaixo e favor inserir no readme quando for fazer a entrega via Github.
+---
 
-O que você implementou?
+## 🔁 Etapa 6 — Repita para cursos e professores
 
-Como funcionam os endpoints que criou (GET, POST)?
+Crie os arquivos:
 
-O que acontece em cada camada (model, controller, rota)?
+- `models/curso.js`, `controllers/cursoController.js`, `routes/cursos.js`
+- `models/professor.js`, `controllers/professorController.js`, `routes/professores.js`
 
-O que deu errado e como resolveu (se houve erro)?
+Use o mesmo padrão de `aluno`.
 
-Como testou os dados (Postman, navegador, HTML com fetch)?
-```
+---
 
-```
+## 📘 Responda no README
+
+1. O que você implementou?
+2. Como funcionam os endpoints que criou?
+3. O que acontece em cada camada (model, controller, rota)?
+4. O que deu errado e como resolveu?
+5. Como testou os dados (Postman, navegador, fetch)?
+
+---
 
 ## ✅ Conclusão
 
-Este roteiro guiou você pela construção de endpoints JSON com MVC em Node.js, proporcionando:
-
-- Uma arquitetura modular e escalável;
-- Integração com banco de dados PostgreSQL;
-- Facilidade de consumo via front-end ou ferramentas de testes de API;
-- Base sólida para autenticação e manipulação de dados via API RESTful.
-
+- Aplicação prática da arquitetura MVC;
+- Endpoints RESTful com JSON;
+- Integração com banco PostgreSQL;
+- Visualização via front-end básico;
+- Base sólida para autenticação e API completas.
