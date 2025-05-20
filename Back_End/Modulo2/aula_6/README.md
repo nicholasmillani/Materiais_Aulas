@@ -1,220 +1,201 @@
 
-# 🚀 Projeto Back-end II — Endpoints com JSON via Navegador
+# 📘 CRUD de Alunos com HTML, JSON e MVC
 
-Este repositório contém um projeto baseado na arquitetura MVC com Node.js e PostgreSQL. Nesta etapa, o foco é **criar endpoints RESTful** que utilizam **JSON para entrada e saída de dados**, **sem o uso de Postman**, apenas com **HTML + JavaScript no navegador**.
-
----
-
-## 🎯 Objetivos da Aula
-
-- Criar endpoints `GET` e `POST` para os recursos `aluno`, `curso` e `professor`.
-- Testar tudo usando apenas o navegador (sem Postman).
-- Consolidar o uso de JSON e da arquitetura MVC.
-- Criar uma pequena interface HTML para visualizar e enviar dados.
+Este projeto demonstra como implementar um CRUD de alunos utilizando a arquitetura MVC em Node.js com Express, HTML via EJS e endpoints com resposta em JSON.
 
 ---
 
-## 📁 Estrutura Esperada
+## 🎯 Objetivo
 
-Certifique-se de ter a seguinte estrutura:
+- Criar páginas com formulário HTML básico (View)
+- Processar dados recebidos e retorná-los em JSON (Controller + Model)
+- Utilizar a arquitetura MVC separando responsabilidades
+
+---
+
+## 🗂️ Estrutura
 
 ```
-projeto/
-├── models/
-├── controllers/
-├── routes/
-├── views/            # Aqui ficará nosso HTML
-├── config/
-└── app.js
-```
-
-> 💡 Dica: Se os arquivos `aluno.js`, `alunoController.js`, e `alunos.js` ainda não existirem, crie-os agora. Use letras minúsculas e nomes coerentes.
-
----
-
-## 🧭 Como funciona o fluxo MVC
-
-1. O usuário interage com a **interface HTML** no navegador.
-2. O navegador envia uma requisição para uma **rota (route)**.
-3. A rota direciona o pedido para o **controller**.
-4. O controller chama o **model**, que acessa o banco de dados.
-5. A resposta (JSON) volta do model para o controller, e então ao navegador.
-
----
-
-## 🧱 Etapa 1 — Criando o Controller
-
-```javascript
-// controllers/alunoController.js
-
-const Aluno = require('../models/aluno');
-
-// Retorna todos os alunos em JSON
-exports.apiList = async (req, res) => {
-  const alunos = await Aluno.findAll(); // Busca no banco
-  res.json(alunos); // Retorna como JSON
-};
-
-// Busca um aluno por ID
-exports.apiGetById = async (req, res) => {
-  const { id } = req.params;
-  const aluno = await Aluno.findById(id);
-  if (!aluno) {
-    return res.status(404).json({ error: 'Aluno não encontrado' });
-  }
-  res.json(aluno);
-};
-
-// Cria novo aluno a partir dos dados enviados pelo navegador
-exports.apiCreate = async (req, res) => {
-  const { nome, idade } = req.body;
-  const novo = await Aluno.create(nome, idade); // Insere no banco
-  res.status(201).json(novo); // Retorna o aluno criado
-};
+📁 models/aluno.js
+📁 controllers/alunoController.js
+📁 routes/alunos.js
+📁 views/alunos/index.ejs
+📄 app.js
 ```
 
 ---
 
-## 📌 Etapa 2 — Criar as Rotas
+## 1️⃣ View: HTML com EJS
 
-```javascript
-// routes/alunos.js
+📄 `views/alunos/index.ejs`
 
-const express = require('express');
-const router = express.Router();
-const controller = require('../controllers/alunoController');
-
-// Lista todos os alunos
-router.get('/api', controller.apiList);
-
-// Busca um aluno específico por ID
-router.get('/api/:id', controller.apiGetById);
-
-// Cadastra um novo aluno
-router.post('/api', controller.apiCreate);
-
-module.exports = router;
-```
-
-```javascript
-// app.js
-
-const alunosRoutes = require('./routes/alunos');
-app.use('/alunos', alunosRoutes);
-
-// Para servir arquivos HTML da pasta views
-app.use(express.static('views'));
-```
-
----
-
-## 🧠 Etapa 3 — Criar o Model
-
-```javascript
-// models/aluno.js
-
-const db = require('../config/db');
-
-module.exports = {
-  // Retorna todos os alunos
-  async findAll() {
-    const result = await db.query('SELECT * FROM aluno ORDER BY nome ASC');
-    return result.rows;
-  },
-
-  // Busca por ID
-  async findById(id) {
-    const result = await db.query('SELECT * FROM aluno WHERE id = $1', [id]);
-    return result.rows[0];
-  },
-
-  // Insere novo aluno
-  async create(nome, idade) {
-    const result = await db.query(
-      'INSERT INTO aluno (nome, idade) VALUES ($1, $2) RETURNING *',
-      [nome, idade]
-    );
-    return result.rows[0];
-  }
-};
-```
-
----
-
-## 🖥️ Etapa 4 — HTML com `fetch()` no navegador
-
-Crie um arquivo chamado `index.html` dentro da pasta `views/`.
-
-```html
+```ejs
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Cadastro de Alunos</title>
+  <title>Lista de Alunos</title>
 </head>
 <body>
-  <h2>📋 Lista de Alunos</h2>
-  <button onclick="carregarAlunos()">Carregar Alunos</button>
-  <pre id="saida"></pre>
+  <h1>Alunos Cadastrados</h1>
 
-  <h2>➕ Novo Aluno</h2>
-  <input id="nome" placeholder="Nome" />
-  <input id="idade" type="number" placeholder="Idade" />
-  <button onclick="enviarAluno()">Cadastrar</button>
-  <p id="resposta"></p>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Curso</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% alunos.forEach(aluno => { %>
+        <tr>
+          <td><%= aluno.nome %></td>
+          <td><%= aluno.email %></td>
+          <td><%= aluno.curso || "Sem curso" %></td>
+          <td>
+            <form action="/alunos/delete/<%= aluno.id %>" method="POST" style="display:inline;">
+              <button type="submit">Deletar</button>
+            </form>
+            <form action="/alunos/edit/<%= aluno.id %>" method="POST" style="display:inline;">
+              <input name="nome" placeholder="Novo nome" required />
+              <input name="email" placeholder="Novo email" required />
+              <button type="submit">Editar</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
 
-  <script>
-    async function carregarAlunos() {
-      const res = await fetch('/alunos/api');
-      const dados = await res.json();
-      document.getElementById('saida').textContent = JSON.stringify(dados, null, 2);
-    }
-
-    async function enviarAluno() {
-      const nome = document.getElementById('nome').value;
-      const idade = parseInt(document.getElementById('idade').value);
-      const resposta = await fetch('/alunos/api', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, idade })
-      });
-      const json = await resposta.json();
-      document.getElementById('resposta').textContent = 'Aluno cadastrado: ' + JSON.stringify(json);
-      carregarAlunos(); // Atualiza lista
-    }
-  </script>
+  <h2>Cadastrar Novo Aluno</h2>
+  <form action="/alunos" method="POST">
+    <input name="nome" placeholder="Nome" required />
+    <input name="email" placeholder="Email" required />
+    <select name="curso_id">
+      <option value="">Selecione um curso</option>
+      <% cursos.forEach(curso => { %>
+        <option value="<%= curso.id %>"><%= curso.nome %></option>
+      <% }) %>
+    </select>
+    <button type="submit">Cadastrar</button>
+  </form>
 </body>
 </html>
 ```
 
 ---
 
-## 🔁 Etapa 5 — Repita a estrutura para cursos e professores
+## 2️⃣ Controller: `controllers/alunoController.js`
 
-Crie os arquivos `models/curso.js`, `controllers/cursoController.js`, `routes/cursos.js`, e o HTML correspondente.
+```js
+const Aluno = require('../models/aluno');
+const Curso = require('../models/curso');
+
+exports.index = async (req, res) => {
+  const alunos = await Aluno.findAllComCurso();
+  const cursos = await Curso.findAll();
+  res.render('alunos/index', { alunos, cursos });
+};
+
+exports.store = async (req, res) => {
+  await Aluno.create(req.body);
+  res.redirect('/alunos');
+};
+
+exports.update = async (req, res) => {
+  const { id } = req.params;
+  await Aluno.update(id, req.body);
+  res.redirect('/alunos');
+};
+
+exports.destroy = async (req, res) => {
+  const { id } = req.params;
+  await Aluno.delete(id);
+  res.redirect('/alunos');
+};
+
+exports.byCurso = async (req, res) => {
+  const { curso_id } = req.params;
+  const alunos = await Aluno.findByCurso(curso_id);
+  res.json(alunos);
+};
+```
 
 ---
 
-## ✏️ Desafio extra
+## 3️⃣ Model: `models/aluno.js`
 
-Crie um endpoint que retorna apenas os alunos com idade maior que 18.  
-- Rota: `/alunos/api/maiores`  
-- No model, use SQL com `WHERE idade > 18`.
+```js
+const db = require('../config/db');
+
+module.exports = {
+  async create(data) {
+    const query = 'INSERT INTO aluno (nome, email, curso_id) VALUES ($1, $2, $3)';
+    const values = [data.nome, data.email, data.curso_id || null];
+    return db.query(query, values);
+  },
+
+  async findAllComCurso() {
+    const query = `
+      SELECT aluno.id, aluno.nome, aluno.email, curso.nome AS curso
+      FROM aluno
+      LEFT JOIN curso ON aluno.curso_id = curso.id
+      ORDER BY aluno.id ASC
+    `;
+    const result = await db.query(query);
+    return result.rows;
+  },
+
+  async findByCurso(curso_id) {
+    const query = 'SELECT aluno.id, aluno.nome, aluno.email FROM aluno WHERE curso_id = $1 ORDER BY nome ASC';
+    const result = await db.query(query, [curso_id]);
+    return result.rows;
+  },
+
+  async update(id, data) {
+    const query = 'UPDATE aluno SET nome = $1, email = $2 WHERE id = $3';
+    const values = [data.nome, data.email, id];
+    return db.query(query, values);
+  },
+
+  async delete(id) {
+    const query = 'DELETE FROM aluno WHERE id = $1';
+    return db.query(query, [id]);
+  }
+};
+```
 
 ---
 
-## 📘 Responda no README
+## 4️⃣ Rotas: `routes/alunos.js`
 
-1. O que você implementou?
-2. Como os dados trafegam entre navegador, controller e model?
-3. Qual a vantagem de usar apenas HTML + JS?
-4. Houve algum erro? Como resolveu?
+```js
+const express = require('express');
+const router = express.Router();
+const controller = require('../controllers/alunoController');
+
+router.get('/', controller.index);
+router.post('/', controller.store);
+router.post('/edit/:id', controller.update);
+router.post('/delete/:id', controller.destroy);
+router.get('/curso/:curso_id', controller.byCurso);
+
+module.exports = router;
+```
+
+---
+
+## ✅ Testes
+
+| Caminho                             | Resultado                            |
+|-------------------------------------|---------------------------------------|
+| `/alunos`                           | Lista alunos e formulário             |
+| `/alunos/curso/:curso_id`           | Retorna alunos em JSON                |
 
 ---
 
 ## ✅ Conclusão
 
-- Você usou apenas o navegador para testar toda a API.
-- Criou uma interface mínima funcional com HTML e `fetch`.
-- Entendeu como funciona o ciclo completo do padrão MVC.
-- Está pronto para implementar novos recursos com HTML e JSON.
+Esse exemplo implementa a arquitetura MVC completa, utilizando HTML básico com EJS e rotas RESTful com entrada e saída de dados via JSON.
