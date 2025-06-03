@@ -1,161 +1,116 @@
 
-# 📘 Aula 7 – Requisições Assíncronas, Controllers, Protocolos de Rede e Testes com Postman
+# 📘 API MVC com Postman – Criação de Registros
 
-## 🎯 Objetivo Geral
-Desenvolver habilidades práticas para compreender e testar APIs web utilizando Express.js com MVC, simulando requisições reais com o Postman. Essa aula integra os conceitos de redes de computadores (protocolo IP, HTTP), formulários HTML e rotas, e permite que os alunos interajam diretamente com os controllers `aluno`, `curso` e `professor`.
-
----
-
-## 📌 Conteúdo Programático
-
-### 1. Fundamentos de Redes de Computadores (20 min)
-- Diferença entre cliente e servidor.
-- O que é IP (`127.0.0.1` = `localhost`) e porta (`3000`).
-- Protocolo HTTP e métodos (GET, POST, PUT, DELETE).
-- Status codes: `200`, `201`, `404`, `500`.
+Este repositório demonstra como interagir com uma API construída no padrão MVC utilizando o Postman. A proposta é realizar **operações de criação** para os recursos `curso`, `professor` e `aluno`, em um banco de dados inicialmente vazio.
 
 ---
 
-### 2. Entendendo o projeto MVC (15 min)
-- **Model:** Lida com o banco de dados.
-- **View:** Formulários HTML (EJS).
-- **Controller:** Lógica de negócio, onde ocorrem as ações de salvar, buscar, atualizar e deletar.
+## 🎯 Objetivos
+
+- Compreender o envio de dados via JSON para a API.
+- Utilizar requisições HTTP do tipo `POST`.
+- Registrar dados reais no banco de dados utilizando Postman.
+- Refletir sobre o fluxo de dados entre cliente e servidor no modelo MVC.
 
 ---
 
-### 3. Explorando controllers existentes (20 min)
+## 🧰 Pré-requisitos
 
-#### Aluno (`controllers/alunoController.js`)
-```js
-exports.store = async (req, res) => {
-  await Aluno.create(req.body);
-  res.redirect('/alunos');
-};
-
-exports.update = async (req, res) => {
-  const { id } = req.params;
-  await Aluno.update(id, req.body);
-  res.redirect('/alunos');
-};
-
-exports.destroy = async (req, res) => {
-  const { id } = req.params;
-  await Aluno.delete(id);
-  res.redirect('/alunos');
-};
-```
-
-#### Curso (`controllers/cursoController.js`)
-```js
-exports.create = async (req, res) => {
-  const { nome } = req.body;
-  await Curso.create(nome);
-  res.redirect('/alunos');
-};
-```
-
-#### Professor (`controllers/professorController.js`)
-```js
-exports.create = async (req, res) => {
-  const { nome, email } = req.body;
-  await Professor.create(nome, email);
-  res.redirect('/professores');
-};
-```
+- Projeto em Node.js já rodando com `node app.js`.
+- Middleware JSON habilitado no `app.js`:
+  ```js
+  app.use(express.json());
+  ```
+- Banco de dados configurado e vazio.
+- Postman instalado.
 
 ---
 
-### 4. Introdução ao Postman (10 min)
+## 🚀 Inicializando o servidor
 
-#### O que é o Postman?
-- Ferramenta de testes de APIs.
-- Permite enviar requisições HTTP como GET, POST, PUT, DELETE.
-- Permite visualizar respostas, status, headers e corpo da resposta.
-
-#### Conceitos básicos:
-- **Method**: tipo de requisição.
-- **URL**: endereço da rota.
-- **Body**: conteúdo da requisição.
-- **Params**: valores passados na URL.
-- **Headers**: informações adicionais (ex.: `Content-Type`).
+1. Acesse o terminal e navegue até a pasta do projeto.
+2. Execute:
+   ```bash
+   node app.js
+   ```
+3. Confirme que o servidor está ativo:
+   ```
+   Servidor rodando em http://localhost:3000
+   ```
 
 ---
 
-### 5. Testes práticos com Postman (30 min)
+## 🛠️ Configuração no Postman
 
-#### Criar um aluno
-- Método: POST
-- URL: `http://localhost:3000/alunos`
-- Headers: `Content-Type: application/json`
-- Body (raw):
+- Selecione o método `POST`.
+- Em **Headers**, adicione:
+  ```
+  Content-Type: application/json
+  Accept: application/json
+  ```
+- Em **Body > raw**, selecione o tipo `JSON`.
+
+---
+
+## 📚 Criar Curso (POST `/cursos`)
+
+**URL:** `http://localhost:3000/cursos`
+
 ```json
 {
-  "nome": "Fernanda Lima",
-  "email": "fernanda@example.com"
+  "nome": "Engenharia da Computação",
+  "descricao": "Curso criado via Postman"
 }
 ```
 
-#### Listar alunos
-- Método: GET
-- URL: `http://localhost:3000/alunos`
+---
 
-#### Atualizar aluno
-- Método: PUT
-- URL: `http://localhost:3000/alunos/1`
-- Body:
+## 👨‍🏫 Criar Professor (POST `/professores`)
+
+**URL:** `http://localhost:3000/professores`
+
 ```json
 {
-  "nome": "Fernanda L. Souza"
+  "nome": "Dra. Fernanda Lima",
+  "email": "fernanda@faculdade.com"
 }
 ```
 
-#### Deletar aluno
-- Método: DELETE
-- URL: `http://localhost:3000/alunos/1`
-
-> 🧪 Faça o mesmo com `/professores` e `/cursos`, adaptando os dados!
-
 ---
 
-### 6. Integração com formulários HTML (15 min)
+## 👨‍🎓 Criar Aluno (POST `/alunos`)
 
-```html
-<form action="/alunos" method="POST">
-  <input type="text" name="nome" placeholder="Nome" required />
-  <input type="email" name="email" placeholder="Email" required />
-  <button type="submit">Cadastrar</button>
-</form>
+**URL:** `http://localhost:3000/alunos`
+
+> Consulte previamente os cursos com `GET /cursos` para obter um `curso_id` válido.
+
+### Com curso:
+```json
+{
+  "nome": "Carlos Souza",
+  "email": "carlos@email.com",
+  "curso_id": 1
+}
 ```
 
-- Esse formulário envia dados via `POST` para o controller de alunos.
+### Sem curso:
+```json
+{
+  "nome": "Aluno sem curso",
+  "email": "aluno@email.com"
+}
+```
 
 ---
 
-### 7. Atividade prática orientada (20 min)
+## ✅ Conclusão
 
-**Objetivo:** Cada grupo deve criar, listar, editar e deletar dados via Postman para uma entidade (`alunos`, `professores` ou `cursos`).
+Após seguir os passos acima, você será capaz de:
 
-1. Crie 2 entradas (POST).
-2. Liste os dados (GET).
-3. Atualize 1 item (PUT).
-4. Apague 1 item (DELETE).
-5. Tire print das requisições e organize num PDF para entrega.
+- Registrar cursos, professores e alunos no banco via Postman.
+- Utilizar corretamente o método HTTP `POST` com JSON.
+- Compreender o comportamento de APIs RESTful integradas ao padrão MVC.
 
 ---
 
-### 8. Encerramento e Perguntas (10 min)
-- Revisar diferenças entre métodos HTTP.
-- Dúvidas sobre o Postman.
-- Dicas para debugar: usar o console do Node.js, `console.log(req.body)`, verificar erro 404 e 500.
-
----
-
-## 👨‍🏫 Professor
-
-**Cristiano da Silva Benites**  
-Especialista em Back-end, MVC, Postman, Redes e Educação Técnica
-
----
-
-🎓 **Dica para o GitHub:** este README pode ser usado diretamente no repositório da aula para que os alunos o sigam passo a passo.
-
+> ⚠️ Este guia cobre apenas a criação de dados. As operações de leitura, atualização e exclusão serão abordadas em etapas futuras.
