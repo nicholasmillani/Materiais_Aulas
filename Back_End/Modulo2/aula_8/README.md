@@ -45,14 +45,37 @@ aula9/
   - Campo verde
   - Elementos animados
 
-Exemplo de estrutura:
+#### 💡 Código HTML:
 
 ```html
-<div class="card card-ceu">
-  <h2>Céu Azul Gradiente</h2>
-  <p>Descrição explicativa...</p>
-</div>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fazendinha Virtual</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <section class="container">
+    <div class="card card-ceu">
+      <h2>Céu Azul Gradiente</h2>
+      <p>Um belo céu com gradiente criado puramente em CSS, representando a parte superior da nossa fazendinha virtual.</p>
+    </div>
+    <div class="card card-campo">
+      <h2>Campo Verde</h2>
+      <p>Uma área verde vibrante que serve como base para nossa fazenda, onde nossos animais irão passear.</p>
+    </div>
+    <div class="card card-elementos">
+      <h2>Elementos Animados</h2>
+      <p>Uma vaquinha com manchas e um sol giratório, todos criados e animados usando apenas HTML e CSS, sem necessidade de JavaScript.</p>
+    </div>
+  </section>
+</body>
+</html>
 ```
+
+---
 
 ### 🎨 `style.css`
 
@@ -60,11 +83,63 @@ Exemplo de estrutura:
 - Aplica **responsividade com CSS Grid**, ideal para layouts adaptáveis.
 - Inclui diferenciação visual por meio de bordas coloridas e animações sutis.
 
-Principais recursos aplicados:
+#### 💡 Código CSS:
 
-- `display: grid` e `grid-template-columns`
-- `border-radius`, `box-shadow`
-- `hover` para efeito interativo
+```css
+body {
+  font-family: Arial, sans-serif;
+  background-color: #111;
+  margin: 0;
+  padding: 2rem;
+}
+
+.container {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  justify-items: center;
+}
+
+.card {
+  background-color: #e9e9e9;
+  border-radius: 10px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 400px;
+  color: #2e4372;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border: 2px solid transparent;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+.card-ceu {
+  border-color: #5c0f0f;
+}
+
+.card-campo {
+  border-color: #5c0f0f;
+}
+
+.card-elementos {
+  border-color: #3b6cb7;
+}
+
+.card h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  color: #233d6d;
+}
+
+.card p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+```
 
 ---
 
