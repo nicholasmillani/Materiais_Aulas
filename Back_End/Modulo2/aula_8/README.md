@@ -51,26 +51,23 @@ aula9/
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fazendinha Virtual</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <section class="container">
-    <div class="card card-ceu">
-      <h2>Céu Azul Gradiente</h2>
-      <p>Um belo céu com gradiente criado puramente em CSS, representando a parte superior da nossa fazendinha virtual.</p>
+  <div class="ceu">
+    <div class="sol"></div>
+  </div>
+  <div class="campo">
+    <div class="vaca">
+      <div class="corpo"></div>
+      <div class="mancha uma"></div>
+      <div class="mancha duas"></div>
+      <div class="cabeca"></div>
     </div>
-    <div class="card card-campo">
-      <h2>Campo Verde</h2>
-      <p>Uma área verde vibrante que serve como base para nossa fazenda, onde nossos animais irão passear.</p>
-    </div>
-    <div class="card card-elementos">
-      <h2>Elementos Animados</h2>
-      <p>Uma vaquinha com manchas e um sol giratório, todos criados e animados usando apenas HTML e CSS, sem necessidade de JavaScript.</p>
-    </div>
-  </section>
+  </div>
 </body>
 </html>
 ```
@@ -86,58 +83,114 @@ aula9/
 #### 💡 Código CSS:
 
 ```css
+/* Estilização global da página */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #111;
   margin: 0;
-  padding: 2rem;
+  padding: 0;
+  font-family: sans-serif;
+  overflow-x: hidden;
 }
 
-.container {
-  display: grid;
-  gap: 2rem;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  justify-items: center;
+/* Seção do céu com gradiente azul para representar o topo da fazenda */
+.ceu {
+  width: 100%;
+  height: 50vh;
+  background: linear-gradient(to bottom, #87ceeb, #ffffff); /* gradiente azul para branco */
+  position: relative;
+  overflow: hidden;
 }
 
-.card {
-  background-color: #e9e9e9;
-  border-radius: 10px;
-  padding: 1.5rem;
-  width: 90%;
-  max-width: 400px;
-  color: #2e4372;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  border: 2px solid transparent;
-  transition: transform 0.3s ease;
+/* Seção do campo verde onde os animais passeiam */
+.campo {
+  width: 100%;
+  height: 50vh;
+  background-color: #7cfc00; /* verde vibrante */
+  position: relative;
+  overflow: hidden;
 }
 
-.card:hover {
-  transform: scale(1.02);
+/* Sol giratório com animação e movimento de flutuação */
+.sol {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, #FFD700 60%, #FFA500); /* amarelo com laranja */
+  border-radius: 50%; /* formato circular */
+  animation: girar 6s linear infinite, flutuar 4s ease-in-out infinite alternate;
 }
 
-.card-ceu {
-  border-color: #5c0f0f;
+/* Animação para girar o sol continuamente */
+@keyframes girar {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.card-campo {
-  border-color: #5c0f0f;
+/* Animação para flutuar o sol suavemente para cima e para baixo */
+@keyframes flutuar {
+  from { top: 30px; }
+  to { top: 50px; }
 }
 
-.card-elementos {
-  border-color: #3b6cb7;
+/* Vaquinha com animação de caminhada horizontal contínua */
+.vaca {
+  position: absolute;
+  bottom: 10px;
+  width: 140px;
+  height: 100px;
+  animation: andar 8s linear infinite; /* movimento da vaquinha */
 }
 
-.card h2 {
-  font-size: 1.4rem;
-  margin-bottom: 0.5rem;
-  color: #233d6d;
+/* Animação da vaquinha: atravessa a tela e vira ao chegar no fim */
+@keyframes andar {
+  0% { left: -150px; }
+  50% { left: calc(100% + 10px); transform: scaleX(1); }
+  51% { transform: scaleX(-1); }
+  100% { left: -150px; transform: scaleX(-1); }
 }
 
-.card p {
-  font-size: 1rem;
-  line-height: 1.5;
+/* Corpo principal da vaca */
+.corpo {
+  width: 100%;
+  height: 70px;
+  background: white;
+  border-radius: 12px;
+  position: relative;
+}
+
+/* Cabeça circular da vaca */
+.cabeca {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  left: -35px;
+  top: 15px;
+}
+
+/* Manchas pretas circulares no corpo da vaca */
+.mancha {
+  position: absolute;
+  background: black;
+  border-radius: 50%;
+}
+
+/* Primeira mancha */
+.mancha.uma {
+  width: 20px;
+  height: 20px;
+  top: 15px;
+  left: 25px;
+}
+
+/* Segunda mancha */
+.mancha.duas {
+  width: 18px;
+  height: 18px;
+  top: 35px;
+  left: 85px;
 }
 ```
 
