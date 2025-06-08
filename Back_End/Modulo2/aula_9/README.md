@@ -1,4 +1,4 @@
-# 📚 Revisão ENADE – Prova de Desenvolvimento Web e Banco de Dados
+# 📚 Revisão Prova de Desenvolvimento Web e Banco de Dados
 
 Este repositório contém um conjunto de **10 questões de múltipla escolha** no estilo ENADE, abordando conceitos fundamentais de desenvolvimento web, arquitetura de sistemas e bancos de dados. As questões foram elaboradas como ferramenta de revisão e aprofundamento para os estudantes.
 
@@ -6,17 +6,17 @@ Este repositório contém um conjunto de **10 questões de múltipla escolha** n
 
 ## 🎯 Objetivo
 
-A proposta desta prova é reforçar o aprendizado teórico e prático dos alunos através da análise crítica de afirmativas baseadas em cenários reais de projetos de software e modelagem de dados.
+A proposta desta revisão é reforçar o aprendizado teórico através da análise crítica de afirmativas baseadas em cenários reais de projetos de software e modelagem de dados.
 
 ---
 
-## 📝 Instruções para os alunos
+## 📝 Instruções 
 
 1. Leia atentamente o enunciado de cada questão.
 2. Analise todas as afirmativas com base em seus conhecimentos técnicos.
 3. Escolha a alternativa correta no formato:
    **"É correto o que se afirma em: A, B, C, D ou E".**
-4. Registre suas respostas em seu caderno ou formulário de resposta.
+4. Registre suas respostas pois ao final será entregue ao professor.
 
 ---
 
