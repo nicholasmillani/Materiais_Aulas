@@ -31,7 +31,7 @@ III. Uma disciplina pode ser associada a múltiplos professores, o que justifica
 IV. O uso de constraints como FOREIGN KEY garante que registros referenciados existam nas tabelas originais.  
 
 **É correto o que se afirma em:**  
-A) I, II e IV, apenas.  
+A) I, II e IV, apenas.  ✅
 B) I e III, apenas.  
 C) II, III e IV, apenas.  
 D) I, II e III, apenas.  
@@ -46,7 +46,7 @@ III. A View representa a saída visual da aplicação e é gerada a partir das i
 IV. Separar lógica de negócio e interface facilita a manutenção e reuso de código.  
 
 **É correto o que se afirma em:**  
-A) I, III e IV, apenas.  
+A) I, III e IV, apenas.  ✅
 B) I e II, apenas.  
 C) III e IV, apenas.  
 D) II, III e IV, apenas.  
@@ -65,7 +65,7 @@ A) I, II e III, apenas.
 B) I e IV, apenas.  
 C) II e III, apenas.  
 D) I, III e IV, apenas.  
-E) Todas as afirmativas estão corretas.
+E) Todas as afirmativas estão corretas.✅
 
 ### QUESTÃO 4 – Requisições Assíncronas com Controllers
 Em uma aplicação que utiliza o framework Express.js, o aluno foi encarregado de implementar a lógica do backend. O sistema recebe requisições assíncronas do frontend utilizando a Fetch API e responde com dados obtidos de um banco PostgreSQL. A lógica de cada rota é implementada em controladores assíncronos.
@@ -76,7 +76,7 @@ III. Controllers devem concentrar a lógica de negócio e persistência para sim
 IV. As funções assíncronas exigem tratamento de erros com try/catch para evitar travamentos na aplicação.  
 
 **É correto o que se afirma em:**  
-A) I, II e IV, apenas.  
+A) I, II e IV, apenas.  ✅
 B) II e III, apenas.  
 C) I, III e IV, apenas.  
 D) I, II e III, apenas.  
@@ -91,7 +91,7 @@ III. A camada de dados deve encapsular o acesso ao banco, impedindo o acesso dir
 IV. A ausência de camadas intermediárias favorece o acoplamento e reduz a reutilização de componentes.  
 
 **É correto o que se afirma em:**  
-A) I, II e III, apenas.  
+A) I, II e III, apenas.  ✅
 B) II, III e IV, apenas.  
 C) I, III e IV, apenas.  
 D) I, II e IV, apenas.  
@@ -121,7 +121,7 @@ III. O Supabase fornece serviços de autenticação e banco de dados prontos par
 IV. Após inicializar um projeto Node com npm init -y, não é necessário criar manualmente o package.json.  
 
 **É correto o que se afirma em:**  
-A) I, II e IV, apenas.  
+A) I, II e IV, apenas.  ✅
 B) I, II e III, apenas.  
 C) II, III e IV, apenas.  
 D) I, III e IV, apenas.  
@@ -138,7 +138,7 @@ IV. Uma tabela pode conter múltiplas chaves primárias, desde que em colunas di
 **É correto o que se afirma em:**  
 A) I, II e III, apenas.  
 B) I e IV, apenas.  
-C) II e III, apenas.  
+C) II e III, apenas.  ✅
 D) I, III e IV, apenas.  
 E) Todas as afirmativas estão corretas.
 
@@ -151,7 +151,7 @@ III. O Controller centraliza a lógica de negócio e se comunica tanto com o Mod
 IV. É uma boa prática permitir que a View invoque diretamente métodos do banco de dados para maior eficiência.  
 
 **É correto o que se afirma em:**  
-A) I, II e III, apenas.  
+A) I, II e III, apenas.  ✅
 B) II e IV, apenas.  
 C) I, III e IV, apenas.  
 D) I, II e IV, apenas.  
